@@ -1,6 +1,6 @@
 ---
 title: "SDS192 Lab 3"
-author: Section WRITE YOUR SECTION NUMBER HERE - WRITE YOUR NAME HERE
+author: 03 - Ellie Zdancewic
 output:
   html_document
 ---
@@ -39,8 +39,8 @@ library(spotifyr)
 5. Copy client id and secret into the chunk below to replace the current client id and secret, and then run the code chunk.
 
 ```{r}
-id <- 'c283abfcc1c94026a6075358ab4ecfbe'
-secret <- '3ee9ec4cd1cf433a8d3be549212f2a67'
+id <- '855ed4afe4064cee8febe00ec02e3e17'
+secret <- 'ab3e242619db48a4bcde4060b50c4873'
 Sys.setenv(SPOTIFY_CLIENT_ID = id)
 Sys.setenv(SPOTIFY_CLIENT_SECRET = secret)
 access_token <- get_spotify_access_token()
@@ -51,21 +51,19 @@ access_token <- get_spotify_access_token()
 Replace the text Janelle Monae below with the name of your favorite artist and then run the code chunk. 
 
 ```{r}
-artist <- get_artist_audio_features(artist = "Janelle Monae") |>
+artist <- get_artist_audio_features(artist = "Hozier") |>
   select(-c(album_images, artists, available_markets))
+
 ```
 
-# Step 4: View the Data Using Two Approaches
-
-View the artist data frame you have created. 
 
 ```{r}
-# Write your code below
+glimpse(artist)
 
 ```
 
 ```{r}
-# Write your code below
+head(artist)
 
 ```
 
@@ -76,7 +74,12 @@ View the artist data frame you have created.
 (3) Set the line color for bins.
 
 ```{r}
-# Write your code below 
+ggplot( data = artist, aes(x=duration_ms)) + 
+  geom_histogram(color = "purple", binwidth = 5000) + 
+  labs(title = "Duration of Hozier Songs", 
+       x = "Duration in Milliseconds",
+       y = "Frequency")  
+
 
 ```
 
@@ -84,13 +87,20 @@ View the artist data frame you have created.
 > Interpreting histograms: (1) Peaks; (2) Spread; (3) Skewed data; (4) Outliers.
 
 **Answer**:
+There appears to be a peak at 225000 milliseconds which means that the highest frequency of songs are around this length. The range is from [150000, 350000] milliseconds which means that those are the maximum and minimum song lengths. The data is skewed left. There are outliers at 150000 seconds. 
+
 
 # Step 6: Facet Your Previous Plot by Album Name
 
 Set `nrow` of your choice in the `facet_wrap` function.
 
 ```{r}
-# Paste the code below and adjust it 
+ggplot( data = artist, aes(x=duration_ms)) + 
+  geom_histogram(color = "purple", binwidth = 50000) + 
+  labs(title = "Duration of Hozier Songs", 
+       x = "Duration in Milliseconds",
+       y = "Frequency") + 
+  facet_wrap(vars(album_name), nrow=2)
 
 ```
 
@@ -98,12 +108,20 @@ Set `nrow` of your choice in the `facet_wrap` function.
 
 **Answer**:
 
+The distributions indicate that the "Hozier" album has the most consistent song length for all of its songs. Interestingly, "Hozier (Expanded Edition)" has longer songs than just "Hozier", indicating that the bonus songs are longer than the original songs. "Unreal Unearth" is skewed left while "Wasteland, Baby!" is skewed right, indicating that "Unreal Unearth" has shorter songs on average than "Wasteland, Baby!"
+
 # Step 7: Create a Stacked, Dodged, or Filled Barplot Visualizing the Frequency of Songs in Each Album and Key Mode for This Artist
 
 Use the `coord_flip()` function to flip the x-axis and the y-axis. Also, be sure to add labels to your plot.  
 
 ```{r}
-# Write your code below
+ggplot(data = artist, aes(x=key_mode, fill = album_name)) + 
+  geom_bar() + 
+  coord_flip() + 
+  labs(
+    title = "Key of Hozier Songs",
+    x = "Key",
+    y = "Frequency") 
 
 ```
 
@@ -116,7 +134,15 @@ I want to reorder my x-axis, so I will place the `reorder()` function around my 
 * and a function to determine how values will be reordered: `length`
 
 ```{r}
-# Paste the code below and adjust it
+ggplot(data = artist, aes(reorder(key_mode, key_mode, length),
+                          fill = album_name)
+       ) + 
+  geom_bar() + 
+  coord_flip()+ 
+  labs(
+    title = "Key of Hozier Songs",
+    x = "Frequency",
+    y = "Key")
 
 ```
 
@@ -124,12 +150,22 @@ I want to reorder my x-axis, so I will place the `reorder()` function around my 
 
 **Answer**:
 
+The frequencies indicate the number of songs in each key. I have learned that "Hozier" had no songs in G# minor, F major, D minor, C# minor, B minor, or A# minor. The rest of the albums are pretty evenly distributed between the keys. Hozier's most common keys by far are G major and C major. 
+
 # Step 9: Create Grouped Boxplots Visualizing the Distribution of Values in a Song Feature of Your Choice, Grouped by Album Name
 
 Use the `coord_flip()` function to flip the x-axis and the y-axis. Also, be sure to add labels to your plot. 
 
 ```{r}
-# Write your code below
+ggplot( data = artist, aes(acousticness, color = album_name)) + 
+  geom_boxplot() + 
+  coord_flip() + 
+  labs (
+    title = "Acousticness of Hozier Songs",
+    color = "Album Name",
+    x = "Energy"
+  )
+  
 
 ```
 
@@ -142,7 +178,15 @@ I want to reorder my x-axis, so I will place the `reorder()` function around my 
 * and a function to determine how values will be reordered: `median`
 
 ```{r}
-# Paste the code below and adjust it
+ggplot( data = artist, aes(x = reorder(album_name, acousticness, median), y = acousticness, color = album_name)) + 
+  geom_boxplot() + 
+  coord_flip() + 
+  labs (
+    title = "Acousticness of Hozier Songs",
+    color = "Album Name",
+    x = "Albums", 
+    y = "Acousticness"
+  )
 
 ```
 
@@ -150,6 +194,16 @@ I want to reorder my x-axis, so I will place the `reorder()` function around my 
 > Interpreting boxplots: (1) Check for outliers; (2) Compare medians; (3) Compare the ranges; (4) Compare the IQRs; (5) Compare the symmetry. (Questions in Lec 6 Slides Page 14-18 will be a good guide to answer this.)
 
 **Answer**:
+1. The only apparent outlier is in "Wasteland, Baby!". One song is extremely more acoustic than the rest of the album, being close to 0.8 on the acoustic scale while the rest of the album is well below 0.6. This implies that while most of the songs on the album are very un-acoustic (more production/synth), one song is very acoustic. 
+
+2. Hozier (Expanded Edition) has the highest median, but each album except Wasteland, Baby! has about the same median. Wasteland, Baby! has a much lower median, around 0.2 while the other three are between 0.4 and 0.5. This means that on average, Wasteland, Baby! is the least acoustic album of Hozier. 
+
+3. The ranges of Hozier, Hozier(Expanded Edition), and Unreal Unearth are about the same, at about 0.8. Wasteland baby has a much smaller range, of about 0.6. 
+
+4. The IQR of Wasteland Baby! is the smallest, while Unreal Unearth is the biggest. Hozier and Hozier(Expanded Edition) have similar IQRs, but Hozier's is slightly longer. 
+
+5. Hozier (Expanded Edition) is by far the most symmetric, while Wasteland, Baby! is certainly the least symmetric, being very right skewed. Hozier and Unreal Unearth are also right skewed, but not nearly as much. 
+
 
 # Step 11: Ethical Considerations
 
@@ -159,4 +213,4 @@ I want to reorder my x-axis, so I will place the `reorder()` function around my 
 
 **Answer**:
 
-
+I think we should be moderately concerned about Spotify's algorithm. Because Spotify is a company that has built its business model on accurately recommending music to its users, it makes sense that it would collect data on the genres, moods, and listening habits of its users. However, Spotify becomes unethical when it records data about a user’s gender, location, mood, and sexuality, and furthermore, sells it for a profit. Because Spotify’s algorithm is based on real-life data sets, it is subject to real-life biases in its recommendation system. However, Spotify’s data collection is interesting because it’s so popular- everybody (including myself) looks forward to their Spotify Wrapped at the end of the year. I don’t think Spotify is inherently unethical in collecting data and using it for Wrapped and recommendations. However, potential social consequences of collecting personal data include outing people, discrimination, and privacy concerns. 

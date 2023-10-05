@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.353">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="03 - Ellie Zdancewic">
+
+<title>SDS192 Lab 3</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Lab3_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Lab3_files/libs/quarto-html/quarto.js"></script>
+<script src="Lab3_files/libs/quarto-html/popper.min.js"></script>
+<script src="Lab3_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Lab3_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Lab3_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Lab3_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Lab3_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Lab3_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Lab3_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">SDS192 Lab 3</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>03 - Ellie Zdancewic </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="todays-dataset" class="level1">
+<h1>Today’s Dataset</h1>
+<ol type="1">
+<li>Spotify has an <a href="https://en.wikipedia.org/wiki/API">Application Programming Interface (API)</a> that allows us to access data about music on the platform.</li>
+<li>We can access data about specific songs, playlists, and artists.</li>
+<li>Variables include things such as acousticness, danceability, and speechiness, album information, and key.</li>
+</ol>
+</section>
+<section id="step-1-install-and-load-packages" class="level1">
+<h1>Step 1: Install and Load Packages</h1>
+<p>In your console install the Spotify R package:</p>
+<p><code>install.packages("spotifyr")</code></p>
+<p>Then load the packages for this lab by running the code below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Load packages</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spotifyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-2-create-a-spotify-developer-account" class="level1">
+<h1>Step 2: Create a Spotify Developer Account</h1>
+<ol type="1">
+<li>Log-in to Spotify.com or create an account.</li>
+<li>Go to <a href="https://developer.spotify.com/dashboard">https://developer.spotify.com/dashboard</a></li>
+<li>Create an app named “SDS192 Lab 3”. You can indicate that this is “for Lab 3”.</li>
+<li>Click “SHOW CLIENT SECRET”.</li>
+<li>Copy client id and secret into the chunk below to replace the current client id and secret, and then run the code chunk.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>id <span class="ot">&lt;-</span> <span class="st">'855ed4afe4064cee8febe00ec02e3e17'</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>secret <span class="ot">&lt;-</span> <span class="st">'ab3e242619db48a4bcde4060b50c4873'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">SPOTIFY_CLIENT_ID =</span> id)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">SPOTIFY_CLIENT_SECRET =</span> secret)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>access_token <span class="ot">&lt;-</span> <span class="fu">get_spotify_access_token</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="step-3-get-song-features-for-your-favorite-artist" class="level1">
+<h1>Step 3: Get Song Features for Your Favorite Artist</h1>
+<p>Replace the text Janelle Monae below with the name of your favorite artist and then run the code chunk.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>artist <span class="ot">&lt;-</span> <span class="fu">get_artist_audio_features</span>(<span class="at">artist =</span> <span class="st">"Hozier"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">c</span>(album_images, artists, available_markets))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(artist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 58
+Columns: 36
+$ artist_name                  &lt;chr&gt; "Hozier", "Hozier", "Hozier", "Hozier", "…
+$ artist_id                    &lt;chr&gt; "2FXC3k01G6Gw61bmprjgqS", "2FXC3k01G6Gw61…
+$ album_id                     &lt;chr&gt; "3gF9KIynrJaC80HbVayPMx", "3gF9KIynrJaC80…
+$ album_type                   &lt;chr&gt; "album", "album", "album", "album", "albu…
+$ album_release_date           &lt;chr&gt; "2023-08-18", "2023-08-18", "2023-08-18",…
+$ album_release_year           &lt;dbl&gt; 2023, 2023, 2023, 2023, 2023, 2023, 2023,…
+$ album_release_date_precision &lt;chr&gt; "day", "day", "day", "day", "day", "day",…
+$ danceability                 &lt;dbl&gt; 0.376, 0.598, 0.439, 0.314, 0.254, 0.546,…
+$ energy                       &lt;dbl&gt; 0.171, 0.861, 0.652, 0.592, 0.176, 0.599,…
+$ key                          &lt;int&gt; 8, 6, 1, 2, 0, 7, 7, 2, 8, 9, 1, 2, 8, 0,…
+$ loudness                     &lt;dbl&gt; -14.654, -5.351, -7.158, -7.182, -14.979,…
+$ mode                         &lt;int&gt; 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1,…
+$ speechiness                  &lt;dbl&gt; 0.0410, 0.0604, 0.0847, 0.0344, 0.0368, 0…
+$ acousticness                 &lt;dbl&gt; 0.814000, 0.081400, 0.177000, 0.000241, 0…
+$ instrumentalness             &lt;dbl&gt; 8.45e-03, 6.52e-04, 5.17e-05, 2.03e-06, 2…
+$ liveness                     &lt;dbl&gt; 0.1490, 0.1850, 0.1210, 0.1220, 0.0853, 0…
+$ valence                      &lt;dbl&gt; 0.1390, 0.6440, 0.4710, 0.1800, 0.1960, 0…
+$ tempo                        &lt;dbl&gt; 68.033, 161.956, 79.942, 177.939, 77.406,…
+$ track_id                     &lt;chr&gt; "78x3oT0wyvcm9GRmuAP6Vq", "3SRtygyWBQnoxu…
+$ analysis_url                 &lt;chr&gt; "https://api.spotify.com/v1/audio-analysi…
+$ time_signature               &lt;int&gt; 4, 4, 4, 4, 4, 4, 3, 4, 3, 4, 3, 1, 4, 4,…
+$ disc_number                  &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ duration_ms                  &lt;int&gt; 219693, 227826, 233173, 270066, 196613, 2…
+$ explicit                     &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,…
+$ track_href                   &lt;chr&gt; "https://api.spotify.com/v1/tracks/78x3oT…
+$ is_local                     &lt;lgl&gt; FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,…
+$ track_name                   &lt;chr&gt; "De Selby (Part 1)", "De Selby (Part 2)",…
+$ track_preview_url            &lt;chr&gt; "https://p.scdn.co/mp3-preview/1246fb87e8…
+$ track_number                 &lt;int&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13…
+$ type                         &lt;chr&gt; "track", "track", "track", "track", "trac…
+$ track_uri                    &lt;chr&gt; "spotify:track:78x3oT0wyvcm9GRmuAP6Vq", "…
+$ external_urls.spotify        &lt;chr&gt; "https://open.spotify.com/track/78x3oT0wy…
+$ album_name                   &lt;chr&gt; "Unreal Unearth", "Unreal Unearth", "Unre…
+$ key_name                     &lt;chr&gt; "G#", "F#", "C#", "D", "C", "G", "G", "D"…
+$ mode_name                    &lt;chr&gt; "minor", "minor", "major", "major", "majo…
+$ key_mode                     &lt;chr&gt; "G# minor", "F# minor", "C# major", "D ma…</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(artist)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  artist_name              artist_id               album_id album_type
+1      Hozier 2FXC3k01G6Gw61bmprjgqS 3gF9KIynrJaC80HbVayPMx      album
+2      Hozier 2FXC3k01G6Gw61bmprjgqS 3gF9KIynrJaC80HbVayPMx      album
+3      Hozier 2FXC3k01G6Gw61bmprjgqS 3gF9KIynrJaC80HbVayPMx      album
+4      Hozier 2FXC3k01G6Gw61bmprjgqS 3gF9KIynrJaC80HbVayPMx      album
+5      Hozier 2FXC3k01G6Gw61bmprjgqS 3gF9KIynrJaC80HbVayPMx      album
+6      Hozier 2FXC3k01G6Gw61bmprjgqS 3gF9KIynrJaC80HbVayPMx      album
+  album_release_date album_release_year album_release_date_precision
+1         2023-08-18               2023                          day
+2         2023-08-18               2023                          day
+3         2023-08-18               2023                          day
+4         2023-08-18               2023                          day
+5         2023-08-18               2023                          day
+6         2023-08-18               2023                          day
+  danceability energy key loudness mode speechiness acousticness
+1        0.376  0.171   8  -14.654    0      0.0410     0.814000
+2        0.598  0.861   6   -5.351    0      0.0604     0.081400
+3        0.439  0.652   1   -7.158    1      0.0847     0.177000
+4        0.314  0.592   2   -7.182    1      0.0344     0.000241
+5        0.254  0.176   0  -14.979    1      0.0368     0.798000
+6        0.546  0.599   7   -6.442    0      0.0286     0.350000
+  instrumentalness liveness valence   tempo               track_id
+1         8.45e-03   0.1490   0.139  68.033 78x3oT0wyvcm9GRmuAP6Vq
+2         6.52e-04   0.1850   0.644 161.956 3SRtygyWBQnoxuOPtdBPm2
+3         5.17e-05   0.1210   0.471  79.942 4LesrBswFnLcHmwDslst1q
+4         2.03e-06   0.1220   0.180 177.939 6QnfsyzifAJJrNHYTO6j9J
+5         2.66e-02   0.0853   0.196  77.406 3EN1l4uUvFBOy3pD9we2jf
+6         6.86e-02   0.2560   0.331  90.000 2SXx7Ofa79CeJfio98aJcG
+                                                      analysis_url
+1 https://api.spotify.com/v1/audio-analysis/78x3oT0wyvcm9GRmuAP6Vq
+2 https://api.spotify.com/v1/audio-analysis/3SRtygyWBQnoxuOPtdBPm2
+3 https://api.spotify.com/v1/audio-analysis/4LesrBswFnLcHmwDslst1q
+4 https://api.spotify.com/v1/audio-analysis/6QnfsyzifAJJrNHYTO6j9J
+5 https://api.spotify.com/v1/audio-analysis/3EN1l4uUvFBOy3pD9we2jf
+6 https://api.spotify.com/v1/audio-analysis/2SXx7Ofa79CeJfio98aJcG
+  time_signature disc_number duration_ms explicit
+1              4           1      219693    FALSE
+2              4           1      227826    FALSE
+3              4           1      233173    FALSE
+4              4           1      270066    FALSE
+5              4           1      196613    FALSE
+6              4           1      243946    FALSE
+                                                track_href is_local
+1 https://api.spotify.com/v1/tracks/78x3oT0wyvcm9GRmuAP6Vq    FALSE
+2 https://api.spotify.com/v1/tracks/3SRtygyWBQnoxuOPtdBPm2    FALSE
+3 https://api.spotify.com/v1/tracks/4LesrBswFnLcHmwDslst1q    FALSE
+4 https://api.spotify.com/v1/tracks/6QnfsyzifAJJrNHYTO6j9J    FALSE
+5 https://api.spotify.com/v1/tracks/3EN1l4uUvFBOy3pD9we2jf    FALSE
+6 https://api.spotify.com/v1/tracks/2SXx7Ofa79CeJfio98aJcG    FALSE
+            track_name
+1    De Selby (Part 1)
+2    De Selby (Part 2)
+3           First Time
+4            Francesca
+5 I, Carrion (Icarian)
+6       Eat Your Young
+                                                                                            track_preview_url
+1 https://p.scdn.co/mp3-preview/1246fb87e8c13ba8b3cf8b398a65ee5456b91bad?cid=855ed4afe4064cee8febe00ec02e3e17
+2 https://p.scdn.co/mp3-preview/78aff0ba988c329cf2139daa2f5f9dff20762973?cid=855ed4afe4064cee8febe00ec02e3e17
+3 https://p.scdn.co/mp3-preview/9e1308630e66ff952ed852cb10c10026fc1ed47f?cid=855ed4afe4064cee8febe00ec02e3e17
+4 https://p.scdn.co/mp3-preview/887c5c62316b6066e62263c13d1d8ea1478103a2?cid=855ed4afe4064cee8febe00ec02e3e17
+5 https://p.scdn.co/mp3-preview/f9fd7123f805daf6611a8e66f2088973b5e17a32?cid=855ed4afe4064cee8febe00ec02e3e17
+6 https://p.scdn.co/mp3-preview/8ee1bc8dab872019abe1064bc81c0772ae215990?cid=855ed4afe4064cee8febe00ec02e3e17
+  track_number  type                            track_uri
+1            1 track spotify:track:78x3oT0wyvcm9GRmuAP6Vq
+2            2 track spotify:track:3SRtygyWBQnoxuOPtdBPm2
+3            3 track spotify:track:4LesrBswFnLcHmwDslst1q
+4            4 track spotify:track:6QnfsyzifAJJrNHYTO6j9J
+5            5 track spotify:track:3EN1l4uUvFBOy3pD9we2jf
+6            6 track spotify:track:2SXx7Ofa79CeJfio98aJcG
+                                  external_urls.spotify     album_name key_name
+1 https://open.spotify.com/track/78x3oT0wyvcm9GRmuAP6Vq Unreal Unearth       G#
+2 https://open.spotify.com/track/3SRtygyWBQnoxuOPtdBPm2 Unreal Unearth       F#
+3 https://open.spotify.com/track/4LesrBswFnLcHmwDslst1q Unreal Unearth       C#
+4 https://open.spotify.com/track/6QnfsyzifAJJrNHYTO6j9J Unreal Unearth        D
+5 https://open.spotify.com/track/3EN1l4uUvFBOy3pD9we2jf Unreal Unearth        C
+6 https://open.spotify.com/track/2SXx7Ofa79CeJfio98aJcG Unreal Unearth        G
+  mode_name key_mode
+1     minor G# minor
+2     minor F# minor
+3     major C# major
+4     major  D major
+5     major  C major
+6     minor  G minor</code></pre>
+</div>
+</div>
+</section>
+<section id="step-5-create-a-histogram-visualizing-the-distribution-of-values-in-a-song-feature-of-your-choice" class="level1">
+<h1>Step 5: Create a Histogram Visualizing the Distribution of Values in a Song Feature of Your Choice</h1>
+<ol type="1">
+<li>Be sure to add labels to your plot.</li>
+<li>Set appropriate <code>binwidth</code> for bins.</li>
+<li>Set the line color for bins.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>( <span class="at">data =</span> artist, <span class="fu">aes</span>(<span class="at">x=</span>duration_ms)) <span class="sc">+</span> </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"purple"</span>, <span class="at">binwidth =</span> <span class="dv">5000</span>) <span class="sc">+</span> </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Duration of Hozier Songs"</span>, </span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Duration in Milliseconds"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>)  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Lab3_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Discussion</strong>: How do you interpret this plot? &gt; Interpreting histograms: (1) Peaks; (2) Spread; (3) Skewed data; (4) Outliers.</p>
+<p><strong>Answer</strong>: There appears to be a peak at 225000 milliseconds which means that the highest frequency of songs are around this length. The range is from [150000, 350000] milliseconds which means that those are the maximum and minimum song lengths. The data is skewed left. There are outliers at 150000 seconds.</p>
+</section>
+<section id="step-6-facet-your-previous-plot-by-album-name" class="level1">
+<h1>Step 6: Facet Your Previous Plot by Album Name</h1>
+<p>Set <code>nrow</code> of your choice in the <code>facet_wrap</code> function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>( <span class="at">data =</span> artist, <span class="fu">aes</span>(<span class="at">x=</span>duration_ms)) <span class="sc">+</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_histogram</span>(<span class="at">color =</span> <span class="st">"purple"</span>, <span class="at">binwidth =</span> <span class="dv">50000</span>) <span class="sc">+</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Duration of Hozier Songs"</span>, </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Duration in Milliseconds"</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>) <span class="sc">+</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="fu">vars</span>(album_name), <span class="at">nrow=</span><span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Lab3_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Discussion</strong>: What do the distributions indicate? What do you learn when comparing distributions across albums?</p>
+<p><strong>Answer</strong>:</p>
+<p>The distributions indicate that the “Hozier” album has the most consistent song length for all of its songs. Interestingly, “Hozier (Expanded Edition)” has longer songs than just “Hozier”, indicating that the bonus songs are longer than the original songs. “Unreal Unearth” is skewed left while “Wasteland, Baby!” is skewed right, indicating that “Unreal Unearth” has shorter songs on average than “Wasteland, Baby!”</p>
+</section>
+<section id="step-7-create-a-stacked-dodged-or-filled-barplot-visualizing-the-frequency-of-songs-in-each-album-and-key-mode-for-this-artist" class="level1">
+<h1>Step 7: Create a Stacked, Dodged, or Filled Barplot Visualizing the Frequency of Songs in Each Album and Key Mode for This Artist</h1>
+<p>Use the <code>coord_flip()</code> function to flip the x-axis and the y-axis. Also, be sure to add labels to your plot.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> artist, <span class="fu">aes</span>(<span class="at">x=</span>key_mode, <span class="at">fill =</span> album_name)) <span class="sc">+</span> </span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span> </span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Key of Hozier Songs"</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Key"</span>,</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Frequency"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Lab3_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="step-8-reorder-the-x-axis-of-your-previous-plot" class="level1">
+<h1>Step 8: Reorder the x-axis of Your Previous Plot</h1>
+<p>I want to reorder my x-axis, so I will place the <code>reorder()</code> function around my x aesthetic, and assign the following arguments:</p>
+<ul>
+<li>the values to be reordered: <code>key_mode</code></li>
+<li>the values will serve as the basis for reordering: <code>key_mode</code></li>
+<li>and a function to determine how values will be reordered: <code>length</code></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(<span class="at">data =</span> artist, <span class="fu">aes</span>(<span class="fu">reorder</span>(key_mode, key_mode, length),</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>                          <span class="at">fill =</span> album_name)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>       ) <span class="sc">+</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span> </span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>()<span class="sc">+</span> </span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Key of Hozier Songs"</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Frequency"</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Key"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Lab3_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Discussion</strong>: What do the frequencies indicate? What do you learn when comparing frequencies across albums?</p>
+<p><strong>Answer</strong>:</p>
+<p>The frequencies indicate the number of songs in each key. I have learned that “Hozier” had no songs in G# minor, F major, D minor, C# minor, B minor, or A# minor. The rest of the albums are pretty evenly distributed between the keys. Hozier’s most common keys by far are G major and C major.</p>
+</section>
+<section id="step-9-create-grouped-boxplots-visualizing-the-distribution-of-values-in-a-song-feature-of-your-choice-grouped-by-album-name" class="level1">
+<h1>Step 9: Create Grouped Boxplots Visualizing the Distribution of Values in a Song Feature of Your Choice, Grouped by Album Name</h1>
+<p>Use the <code>coord_flip()</code> function to flip the x-axis and the y-axis. Also, be sure to add labels to your plot.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>( <span class="at">data =</span> artist, <span class="fu">aes</span>(acousticness, <span class="at">color =</span> album_name)) <span class="sc">+</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span> (</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Acousticness of Hozier Songs"</span>,</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Album Name"</span>,</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Energy"</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Lab3_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="step-10-reorder-the-x-axis-of-your-previous-plot" class="level1">
+<h1>Step 10: Reorder the x-axis of Your Previous Plot</h1>
+<p>I want to reorder my x-axis, so I will place the <code>reorder()</code> function around my x aesthetic, and assign the following arguments:</p>
+<ul>
+<li>the values to be reordered: <code>album_name</code></li>
+<li>the values will serve as the basis for reordering: <code>valence</code> (yours will be the song feature of your choice)</li>
+<li>and a function to determine how values will be reordered: <code>median</code></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>( <span class="at">data =</span> artist, <span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">reorder</span>(album_name, acousticness, median), <span class="at">y =</span> acousticness, <span class="at">color =</span> album_name)) <span class="sc">+</span> </span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span> </span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_flip</span>() <span class="sc">+</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span> (</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Acousticness of Hozier Songs"</span>,</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">color =</span> <span class="st">"Album Name"</span>,</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Albums"</span>, </span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Acousticness"</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="Lab3_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p><strong>Discussion</strong>: How do you interpret this plot? &gt; Interpreting boxplots: (1) Check for outliers; (2) Compare medians; (3) Compare the ranges; (4) Compare the IQRs; (5) Compare the symmetry. (Questions in Lec 6 Slides Page 14-18 will be a good guide to answer this.)</p>
+<p><strong>Answer</strong>: 1. The only apparent outlier is in “Wasteland, Baby!”. One song is extremely more acoustic than the rest of the album, being close to 0.8 on the acoustic scale while the rest of the album is well below 0.6. This implies that while most of the songs on the album are very un-acoustic (more production/synth), one song is very acoustic.</p>
+<ol start="2" type="1">
+<li><p>Hozier (Expanded Edition) has the highest median, but each album except Wasteland, Baby! has about the same median. Wasteland, Baby! has a much lower median, around 0.2 while the other three are between 0.4 and 0.5. This means that on average, Wasteland, Baby! is the least acoustic album of Hozier.</p></li>
+<li><p>The ranges of Hozier, Hozier(Expanded Edition), and Unreal Unearth are about the same, at about 0.8. Wasteland baby has a much smaller range, of about 0.6.</p></li>
+<li><p>The IQR of Wasteland Baby! is the smallest, while Unreal Unearth is the biggest. Hozier and Hozier(Expanded Edition) have similar IQRs, but Hozier’s is slightly longer.</p></li>
+<li><p>Hozier (Expanded Edition) is by far the most symmetric, while Wasteland, Baby! is certainly the least symmetric, being very right skewed. Hozier and Unreal Unearth are also right skewed, but not nearly as much.</p></li>
+</ol>
+</section>
+<section id="step-11-ethical-considerations" class="level1">
+<h1>Step 11: Ethical Considerations</h1>
+<p><strong>Discussion</strong>: Check out <a href="https://www.vox.com/culture/22814121/spotify-wrapped-2021-algorithm-data-privacy">this article</a> documenting ethical concerns regarding Spotify’s data collection practices. Should we be concerned about the assumptions that Spotify makes about us based on our music streaming habits? What about the way they curate music for us? What are some of the social consequences to this form of user surveillance? (no more than 150 words) <a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<blockquote class="blockquote">
+<p>Use the readings under Lec 10 on our course webpage as references for answering this question.</p>
+</blockquote>
+<p><strong>Answer</strong>:</p>
+<p>I think we should be moderately concerned about Spotify’s algorithm. Because Spotify is a company that has built its business model on accurately recommending music to its users, it makes sense that it would collect data on the genres, moods, and listening habits of its users. However, Spotify becomes unethical when it records data about a user’s gender, location, mood, and sexuality, and furthermore, sells it for a profit. Because Spotify’s algorithm is based on real-life data sets, it is subject to real-life biases in its recommendation system. However, Spotify’s data collection is interesting because it’s so popular- everybody (including myself) looks forward to their Spotify Wrapped at the end of the year. I don’t think Spotify is inherently unethical in collecting data and using it for Wrapped and recommendations. However, potential social consequences of collecting personal data include outing people, discrimination, and privacy concerns.</p>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Here is an example footnote to be used as a citation.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
